@@ -29,7 +29,7 @@ def check_password():
 
 
 if check_password():
-    st.title("FCC内部用 DALL-E3 画像生成")
+    st.title("FCC内部用 DALL-E3 画像生成 ※1回10円")
 
     if 'image_url' not in st.session_state:
         st.session_state['image_url'] = None
