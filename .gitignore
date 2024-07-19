@@ -1,0 +1,2 @@
+# Exclude secrets.toml file
+.streamlit/secrets.toml

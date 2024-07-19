@@ -34,15 +34,12 @@ if check_password():
     if st.button("Generate Image"):
         if prompt:
             with st.spinner("Generating image..."):
-                try:
-                    response = openai.Image.create(
-                        prompt=prompt,
-                        n=1,
-                        size="1024x1024"
-                    )
-                    image_url = response['data'][0]['url']
-                    st.image(image_url, caption=prompt)
-                except Exception as e:
-                    st.error(f"An error occurred: {e}")
+                response = openai.Image.create(
+                    prompt=prompt,
+                    n=1,
+                    size="1024x1024"
+                )
+                image_url = response['data'][0]['url']
+                st.image(image_url, caption=prompt)
         else:
             st.warning("Please enter a prompt!")
