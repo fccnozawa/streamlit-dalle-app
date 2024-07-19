@@ -28,19 +28,20 @@ def check_password():
         return True
 
 if check_password():
-    st.title("DALL-E Image Generator")
+    st.title("FCC内部用 DALL-e3 画像生成")
 
-    prompt = st.text_input("Enter a prompt for DALL-E:")
+    prompt = st.text_input("生成したい画像の内容を入力してください。")
 
-    if st.button("Generate Image"):
+    if st.button("画像を生成する"):
         if prompt:
-            with st.spinner("Generating image..."):
+            with st.spinner("画像生成中..."):
                 response = client.images.generate(
+                    model="dall-e-3",
                     prompt=prompt,
                     n=1,
                     size="1024x1024"
                 )
-                image_url = response['data'][0]['url']
+                image_url = response.data[0].url
                 st.image(image_url, caption=prompt)
         else:
-            st.warning("Please enter a prompt!")
+            st.warning("入力して！")
