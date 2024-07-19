@@ -29,14 +29,14 @@ def check_password():
 
 
 if check_password():
-    st.title("FCC内部用 DALL-E3 画像生成 ※1回10円")
+    st.title("FCC内部用 DALL-E3 画像生成")
 
     if 'image_url' not in st.session_state:
         st.session_state['image_url'] = None
     if 'prompt' not in st.session_state:
         st.session_state['prompt'] = None
 
-    prompt = st.text_input("生成したい画像の内容を入力してください。")
+    prompt = st.text_input("生成したい画像の内容を入力してください。 ※1回10円かかるよ")
 
     if st.button("画像を生成する"):
         if prompt:
