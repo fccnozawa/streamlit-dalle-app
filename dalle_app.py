@@ -1,8 +1,9 @@
-import openai
+from openai import OpenAI
+client = OpenAI()
 import streamlit as st
 
 # Set your OpenAI API key from Streamlit secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+OpenAI.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Simple password authentication
 def check_password():
@@ -34,7 +35,7 @@ if check_password():
     if st.button("Generate Image"):
         if prompt:
             with st.spinner("Generating image..."):
-                response = openai.Image.create(
+                response = client.images.generate(
                     prompt=prompt,
                     n=1,
                     size="1024x1024"
