@@ -31,8 +31,8 @@ def check_password():
 if check_password():
     st.title("FCC内部用 DALL-E3 画像生成")
 
-    if 'image_url' not in st.session_state:
-        st.session_state['image_url'] = None
+    if 'image_urls' not in st.session_state:
+        st.session_state['image_urls'] = []
     if 'prompt' not in st.session_state:
         st.session_state['prompt'] = None
 
@@ -49,13 +49,17 @@ if check_password():
                     style="vivid"
                 )
                 image_url = response.data[0].url
-                st.session_state['image_url'] = image_url
+                st.session_state['image_urls'].append((prompt, image_url))
                 st.session_state['prompt'] = prompt
                 st.image(image_url, caption=prompt)
         else:
             st.warning("入力してください。")
 
-    if st.session_state['image_url']:
+    if st.session_state['image_urls']:
+        st.write("生成された画像:")
+        for p, url in st.session_state['image_urls']:
+            st.image(url, caption=p)
+
         st.write("画像の修正を行うための新しいプロンプトを入力してください。")
         modify_prompt = st.text_input("修正したい内容を入力してください。")
 
@@ -71,7 +75,7 @@ if check_password():
                         style="vivid"
                     )
                     modified_image_url = response.data[0].url
-                    st.session_state['image_url'] = modified_image_url
+                    st.session_state['image_urls'].append((combined_prompt, modified_image_url))
                     st.session_state['prompt'] = combined_prompt
                     st.image(modified_image_url, caption=modify_prompt)
             else:
