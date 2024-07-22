@@ -36,7 +36,7 @@ if check_password():
     if 'prompt' not in st.session_state:
         st.session_state['prompt'] = None
 
-    prompt = st.text_input("生成したい画像の内容を入力してください。 ※1回10円かかるよ")
+    prompt = st.text_input("生成したい画像の内容を入力してください。\n\n※1回の生成はたったの10円。\n\n※具体的な内容で入力した方が精度が高くなります。（例：黒髪ボブの24歳の女性 など）\n\n※入力した内容が学習されないため、誤って送信してしまった場合も情報が漏洩することはありません。\n\n※生成した画像は商用利用が可能です。\n\n")
 
     if st.button("画像を生成する"):
         if prompt:
@@ -45,14 +45,15 @@ if check_password():
                     model="dall-e-3",
                     prompt=prompt,
                     n=1,
-                    size="1024x1024"
+                    size="1024x1024",
+                    style="vivid"
                 )
                 image_url = response.data[0].url
                 st.session_state['image_url'] = image_url
                 st.session_state['prompt'] = prompt
                 st.image(image_url, caption=prompt)
         else:
-            st.warning("入力して！")
+            st.warning("入力してください。")
 
     if st.session_state['image_url']:
         st.write("画像の修正を行うための新しいプロンプトを入力してください。")
@@ -60,16 +61,18 @@ if check_password():
 
         if st.button("画像を修正する"):
             if modify_prompt:
+                combined_prompt = st.session_state['prompt'] + " " + modify_prompt
                 with st.spinner("画像再生成中..."):
                     response = client.images.generate(
                         model="dall-e-3",
-                        prompt=modify_prompt,
+                        prompt=combined_prompt,
                         n=1,
-                        size="1024x1024"
+                        size="1024x1024",
+                        style="vivid"
                     )
                     modified_image_url = response.data[0].url
                     st.session_state['image_url'] = modified_image_url
-                    st.session_state['prompt'] = modify_prompt
+                    st.session_state['prompt'] = combined_prompt
                     st.image(modified_image_url, caption=modify_prompt)
             else:
-                st.warning("修正プロンプトを入力してください！")
+                st.warning("修正する内容を入力してください。")
