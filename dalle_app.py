@@ -29,54 +29,36 @@ def check_password():
 
 
 if check_password():
-    st.title("FCC内部用 DALL-E3 画像生成")
+    st.title("内部用 DALL-E3 画像生成")
 
-    if 'image_urls' not in st.session_state:
-        st.session_state['image_urls'] = []
-    if 'prompt' not in st.session_state:
-        st.session_state['prompt'] = None
+    if 'chat_history' not in st.session_state:
+        st.session_state['chat_history'] = []
 
-    prompt = st.text_input("生成したい画像の内容を入力してください。\n\n※1回の生成はたったの10円。\n\n※具体的な内容で入力した方が精度が高くなります。（例：黒髪ボブの24歳の女性 など）\n\n※入力した内容は学習されません。誤って送信してしまった場合も、情報漏洩の心配がありません。\n\n※生成した画像は商用利用が可能です。\n\n")
+    user_input = st.text_input("画像生成または修正のプロンプトを入力してください。\n\n※1回の生成はたったの10円。\n\n※具体的な内容で入力した方が精度が高くなります。（例：黒髪ボブの24歳の女性 など）\n\n※入力した内容は学習されません。誤って送信してしまった場合も、情報漏洩の心配がありません。\n\n※生成した画像は商用利用が可能です。\n\n")
 
-    if st.button("画像を生成する"):
-        if prompt:
+    if st.button("送信"):
+        if user_input:
             with st.spinner("画像生成中..."):
+                # Combine the last prompt with the new input if it's a modification
+                combined_prompt = st.session_state['chat_history'][-1]['prompt'] + " " + user_input if st.session_state['chat_history'] else user_input
                 response = client.images.generate(
                     model="dall-e-3",
-                    prompt=prompt,
+                    prompt=combined_prompt,
                     n=1,
                     size="1024x1024",
                     style="vivid"
                 )
                 image_url = response.data[0].url
-                st.session_state['image_urls'].append((prompt, image_url))
-                st.session_state['prompt'] = prompt
-                st.image(image_url, caption=prompt)
+                st.session_state['chat_history'].append({
+                    'prompt': combined_prompt,
+                    'image_url': image_url
+                })
+                st.image(image_url, caption=combined_prompt)
         else:
             st.warning("入力してください。")
 
-    if st.session_state['image_urls']:
-        st.write("生成された画像:")
-        for p, url in st.session_state['image_urls']:
-            st.image(url, caption=p)
-
-        st.write("画像の修正を行うための新しいプロンプトを入力してください。")
-        modify_prompt = st.text_input("修正したい内容を入力してください。")
-
-        if st.button("画像を修正する"):
-            if modify_prompt:
-                combined_prompt = st.session_state['prompt'] + " " + modify_prompt
-                with st.spinner("画像再生成中..."):
-                    response = client.images.generate(
-                        model="dall-e-3",
-                        prompt=combined_prompt,
-                        n=1,
-                        size="1024x1024",
-                        style="vivid"
-                    )
-                    modified_image_url = response.data[0].url
-                    st.session_state['image_urls'].append((combined_prompt, modified_image_url))
-                    st.session_state['prompt'] = combined_prompt
-                    st.image(modified_image_url, caption=modify_prompt)
-            else:
-                st.warning("修正する内容を入力してください。")
+    if st.session_state['chat_history']:
+        st.write("チャット履歴:")
+        for chat in st.session_state['chat_history']:
+            st.write(f"プロンプト: {chat['prompt']}")
+            st.image(chat['image_url'], caption=chat['prompt'])
