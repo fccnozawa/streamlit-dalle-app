@@ -27,20 +27,32 @@ def check_password():
         # Password correct.
         return True
 
-
 if check_password():
-    st.title("内部用 DALL-E3 画像生成")
+    st.title("FCC内部用 DALL-E3 画像生成")
 
     if 'chat_history' not in st.session_state:
         st.session_state['chat_history'] = []
 
-    user_input = st.text_input("画像生成または修正のプロンプトを入力してください。\n\n※1回の生成はたったの10円。\n\n※具体的な内容で入力した方が精度が高くなります。（例：黒髪ボブの24歳の女性 など）\n\n※入力した内容は学習されません。誤って送信してしまった場合も、情報漏洩の心配がありません。\n\n※生成した画像は商用利用が可能です。\n\n")
+    # Display chat history
+    if st.session_state['chat_history']:
+        st.write("チャット履歴:")
+        for chat in st.session_state['chat_history']:
+            st.write(f"**入力内容:** {chat['prompt']}")
+            st.image(chat['image_url'], caption=chat['prompt'], use_column_width=True)
+    
+    # Input field for user prompt
+    user_input = st.text_input(
+        "画像生成または修正のプロンプトを入力してください。\n\n"
+        "※1回の生成はたったの10円。\n\n"
+        "※具体的な内容で入力した方が精度が高くなります。イラストの生成も可（例：日本人の黒髪ボブの25歳の女性 など）\n\n"
+        "※入力した内容は学習されません。誤って送信してしまった場合も、情報漏洩の心配がありません。\n\n"
+        "※生成した画像は商用利用が可能です。\n\n"
+    )
 
     if st.button("送信"):
         if user_input:
             with st.spinner("画像生成中..."):
-                # Combine the last prompt with the new input if it's a modification
-                combined_prompt = st.session_state['chat_history'][-1]['prompt'] + " " + user_input if st.session_state['chat_history'] else user_input
+                combined_prompt = user_input if not st.session_state['chat_history'] else f"{st.session_state['chat_history'][-1]['prompt']} {user_input}"
                 response = client.images.generate(
                     model="dall-e-3",
                     prompt=combined_prompt,
@@ -50,15 +62,9 @@ if check_password():
                 )
                 image_url = response.data[0].url
                 st.session_state['chat_history'].append({
-                    'prompt': combined_prompt,
+                    'prompt': user_input,  # Save the user input only
                     'image_url': image_url
                 })
-                st.image(image_url, caption=combined_prompt)
+                st.image(image_url, caption=user_input, use_column_width=True)
         else:
             st.warning("入力してください。")
-
-    if st.session_state['chat_history']:
-        st.write("チャット履歴:")
-        for chat in st.session_state['chat_history']:
-            st.write(f"プロンプト: {chat['prompt']}")
-            st.image(chat['image_url'], caption=chat['prompt'])
