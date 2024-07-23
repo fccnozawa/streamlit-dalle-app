@@ -1,7 +1,6 @@
 from openai import OpenAI
 client = OpenAI()
 import streamlit as st
-import time
 
 # Set your OpenAI API key from Streamlit secrets
 OpenAI.api_key = st.secrets["OPENAI_API_KEY"]
@@ -79,9 +78,9 @@ if check_password():
                     st.experimental_rerun()
                 except Exception as e:
                     if 'content_policy_violation' in str(e):
-                        st.error("申し訳ありませんが、入力された内容が安全システムによって許可されませんでした。プロンプトを調整して再試行してください。")
+                        st.error("申し訳ありませんが、入力された内容が安全システムによって許可されませんでした。入力内容を調整して再試行してください。")
                     else:
                         st.error(f"エラーが発生しました: {str(e)}")
-                    st.info("プロンプトを調整するか、しばらく待ってから再試行してください。")
+                    st.info("入力内容を調整するか、しばらく待ってから再試行してください。")
         else:
             st.warning("入力してください。")
