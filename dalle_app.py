@@ -46,10 +46,11 @@ if check_password():
     # Input field for user prompt
     user_input = st.text_input(
         "画像生成したい内容を入力してください。\n\n"
+        "画像生成後に追加で入力すると、入力内容を保持したまま次の画像が生成されます。\n\n"
         "※1回の生成はたったの10円。\n\n"
         "※具体的な内容で入力した方が精度が高くなります。（例：日本人の黒髪ボブの25歳の女性 など）\n\n"
         "※イラストの生成も可能です。\n\n"
-        "※入力した内容は学習されません。誤って送信してしまった場合も、情報漏洩の心配がありません。\n\n"
+        "※入力した内容は公開されません。誤って送信してしまった場合も、情報漏洩の心配がありません。\n\n"
         "※生成した画像は商用利用が可能です。\n\n",
         key=f"user_input_{st.session_state['input_key']}"
     )
@@ -64,7 +65,9 @@ if check_password():
                         prompt=combined_prompt,
                         n=1,
                         size="1024x1024",
-                        style="vivid"
+                        style="vivid",
+                        quality="hd"
+                        
                     )
                     image_url = response.data[0].url
                     st.session_state['chat_history'].append({
