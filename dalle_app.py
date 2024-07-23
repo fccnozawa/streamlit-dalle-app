@@ -64,7 +64,7 @@ if check_password():
                         model="dall-e-3",
                         prompt=combined_prompt,
                         n=1,
-                        size="1024x1024",
+                        size="1024x1792",
                         style="vivid",
                         quality="hd"
                         
