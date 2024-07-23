@@ -64,10 +64,9 @@ if check_password():
                         model="dall-e-3",
                         prompt=combined_prompt,
                         n=1,
-                        size="1024x1792",
+                        size="1792x1024",
                         style="vivid",
                         quality="hd"
-                        
                     )
                     image_url = response.data[0].url
                     st.session_state['chat_history'].append({
