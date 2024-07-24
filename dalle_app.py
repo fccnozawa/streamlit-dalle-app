@@ -55,34 +55,43 @@ if check_password():
         key=f"user_input_{st.session_state['input_key']}"
     )
 
-    if st.button("送信"):
-        if user_input:
-            with st.spinner("画像生成中..."):
-                try:
-                    combined_prompt = user_input if not st.session_state['chat_history'] else f"{st.session_state['chat_history'][-1]['prompt']} {user_input}"
-                    response = client.images.generate(
-                        model="dall-e-3",
-                        prompt=combined_prompt,
-                        n=1,
-                        size="1792x1024",
-                        style="vivid",
-                        quality="hd"
-                    )
-                    image_url = response.data[0].url
-                    st.session_state['chat_history'].append({
-                        'prompt': user_input,
-                        'image_url': image_url
-                    })
-                    st.image(image_url, caption=user_input, use_column_width=True)
-                    
-                    # Increment the input key to reset the input field
-                    st.session_state['input_key'] += 1
-                    st.experimental_rerun()
-                except Exception as e:
-                    if 'content_policy_violation' in str(e):
-                        st.error("申し訳ありませんが、入力された内容が安全システムによって許可されませんでした。入力内容を調整して再試行してください。")
-                    else:
-                        st.error(f"エラーが発生しました: {str(e)}")
-                    st.info("入力内容を調整するか、しばらく待ってから再試行してください。")
-        else:
-            st.warning("入力してください。")
+    col1, col2, _ = st.columns([0.015, 0.03, 0.1])
+    
+    if user_input:
+        with st.spinner("画像生成中..."):
+            combined_prompt = user_input if not st.session_state['chat_history'] else f"{st.session_state['chat_history'][-1]['prompt']} {user_input}"
+            try:
+                response = client.images.generate(
+                    model="dall-e-3",
+                    prompt=combined_prompt,
+                    n=1,
+                    size="1024x1024",
+                    style="vivid",
+                    quality="standard"
+                )
+                image_url = response.data[0].url
+                st.session_state['chat_history'].append({
+                    'prompt': user_input,
+                    'image_url': image_url
+                })
+                st.image(image_url, caption=user_input, use_column_width=True)
+                
+                # Increment the input key to reset the input field
+                st.session_state['input_key'] += 1
+                st.experimental_rerun()
+            except Exception as e:
+                if 'content_policy_violation' in str(e):
+                    st.error("申し訳ありませんが、入力された内容が安全システムによって許可されませんでした。入力内容を調整して再試行してください。")
+                else:
+                    st.error(f"エラーが発生しました: {str(e)}")
+                st.info("入力内容を調整するか、しばらく待ってから再試行してください。")
+
+    with col1:
+        if st.button("送信"):
+            pass  # The spinner and processing logic are handled above
+
+    with col2:
+        if st.button("リセット"):
+            st.session_state['chat_history'] = []
+            st.session_state['input_key'] += 1
+            st.experimental_rerun()
